@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 110" fill="none">
+  <title>LegalConnect — Concept A (Connection) Dark Version</title>
+  <!-- Mark: Interlocking Pills (white on dark) -->
+  <rect x="24" y="15" width="34" height="80" rx="17" fill="#FFFFFF"/>
+  <rect x="6" y="41" width="80" height="28" rx="14" fill="#FFFFFF" opacity="0.8"/>
+  <!-- Wordmark -->
+  <text x="110" y="52" font-family="Georgia, 'Times New Roman', serif" font-size="34" font-weight="700" fill="#FFFFFF">LegalConnect</text>
+  <!-- Tagline -->
+  <text x="112" y="76" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#FFFFFF" letter-spacing="3.5" opacity="0.8">THE LAW FIRM OPERATING SYSTEM</text>
+</svg>

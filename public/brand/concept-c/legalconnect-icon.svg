@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <title>LegalConnect — Concept C (Operating System) Icon</title>
+  <!-- Outer frame -->
+  <rect x="10" y="10" width="100" height="100" rx="20" fill="none" stroke="#1E3A5F" stroke-width="6"/>
+  <!-- Top-left cell -->
+  <rect x="22" y="22" width="32" height="32" rx="8" fill="#1E3A5F"/>
+  <!-- Top-right cell (amber accent) -->
+  <rect x="66" y="22" width="32" height="32" rx="8" fill="#C89550"/>
+  <!-- Bottom-left cell -->
+  <rect x="22" y="66" width="32" height="32" rx="8" fill="#1E3A5F"/>
+  <!-- Bottom-right cell -->
+  <rect x="66" y="66" width="32" height="32" rx="8" fill="#1E3A5F"/>
+</svg>

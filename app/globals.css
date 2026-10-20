@@ -1,26 +1,180 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --color-lc-ink: var(--lc-ink);
+  --color-lc-paper: var(--lc-paper);
+  --color-lc-paper-warm: var(--lc-paper-warm);
+  --color-lc-ledger: var(--lc-ledger);
+  --color-lc-ledger-dark: var(--lc-ledger-dark);
+  --color-lc-ledger-pale: var(--lc-ledger-pale);
+  --color-lc-stamp: var(--lc-stamp);
+  --color-lc-stamp-dark: var(--lc-stamp-dark);
+  --color-lc-slate: var(--lc-slate);
+ 
+  --font-newsreader: var(--font-newsreader);
+  --font-plexmono: var(--font-plex-mono);
+
+  --animate-stampdown: stampdown 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) 0.35s backwards;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --background: var(--lc-paper);
+  --foreground: var(--lc-ink);
+  --card: var(--lc-paper);
+  --card-foreground: var(--lc-ink);
+  --popover: var(--lc-paper);
+  --popover-foreground: var(--lc-ink);
+ 
+  --primary: var(--lc-stamp);
+  --primary-foreground: var(--lc-paper);
+  --secondary: var(--lc-paper-warm);
+  --secondary-foreground: var(--lc-ink);
+  --muted: var(--lc-paper-warm);
+  --muted-foreground: var(--lc-slate);
+  --accent: var(--lc-ledger-pale);
+  --accent-foreground: var(--lc-ledger);
+ 
+  /* Destructive reuses stamp red — a "voided" row and a stamped one are the same idea here. */
+  --destructive: var(--lc-stamp);
+  --destructive-foreground: var(--lc-paper);
+ 
+  --border: oklch(0.222 0.008 95.4 / 0.12);
+  --input: oklch(0.222 0.008 95.4 / 0.16);
+  --ring: var(--lc-stamp);
+ 
+  /* Sidebar is a fixed dark-ledger "spine" — same in light and dark mode. */
+  --sidebar: var(--lc-ledger-dark);
+  --sidebar-foreground: var(--lc-paper);
+  --sidebar-primary: var(--lc-stamp);
+  --sidebar-primary-foreground: var(--lc-paper);
+  --sidebar-accent: oklch(0.964 0.012 91.5 / 0.08);
+  --sidebar-accent-foreground: var(--lc-paper);
+  --sidebar-border: oklch(0.964 0.012 91.5 / 0.08);
+  --sidebar-ring: var(--lc-stamp);
+ 
+  --chart-1: var(--lc-stamp);
+  --chart-2: var(--lc-ledger);
+  --chart-3: var(--lc-slate);
+  --chart-4: oklch(0.662 0.101 152.9);
+  --chart-5: oklch(0.613 0.168 31.5);
+
+  --lc-ink: oklch(0.222 0.008 95.4);          /* #1C1B17 - primary text, dark bg */
+  --lc-paper: oklch(0.964 0.012 91.5);        /* #F6F3EA - main background */
+  --lc-paper-warm: oklch(0.936 0.020 94.5);   /* #EEEADB - secondary section bg */
+  --lc-ledger: oklch(0.333 0.044 154.6);      /* #233D2C - deep ledger green */
+  --lc-ledger-dark: oklch(0.263 0.037 155.7); /* #152A1D - dark section bg */
+  --lc-ledger-pale: oklch(0.914 0.023 131.2); /* #DDE6D6 - pale ledger green */
+  --lc-stamp: oklch(0.522 0.157 29.6);        /* #B23B2E - stamp red accent */
+  --lc-stamp-dark: oklch(0.437 0.132 29.4);   /* #8C2C22 - stamp red hover */
+  --lc-slate: oklch(0.522 0.017 102.7);       /* #6B6A5F - secondary text */
+
+  --radius: 0.2rem;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+
+  --lc-ink: oklch(0.933 0.019 93.7);          /* #EDE9DB - text flips light */
+  --lc-paper: oklch(0.196 0.012 91.8);        /* #17150F - main bg flips dark */
+  --lc-paper-warm: oklch(0.231 0.017 91.8);   /* #201D14 - secondary panel bg */
+  --lc-ledger: oklch(0.662 0.101 152.9);      /* #5FA575 - brightened for contrast on dark */
+  --lc-ledger-dark: oklch(0.222 0.027 157.0); /* #101F16 - stays near-black green */
+  --lc-ledger-pale: oklch(0.282 0.032 153.3); /* #1D2E22 - "pale" role becomes a muted dark panel */
+  --lc-stamp: oklch(0.613 0.168 31.5);        /* #D6543F - brightened for pop on dark */
+  --lc-stamp-dark: oklch(0.497 0.153 30.2);   /* #A83527 - hover state */
+  --lc-slate: oklch(0.725 0.018 103.3);       /* #A8A79A - lightened for readability */
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+@keyframes stampdown {
+    0% { transform: rotate(-11deg) scale(2.4); opacity: 0; }
+    60% { opacity: 1; }
+    100% { transform: rotate(-11deg) scale(0.94); opacity: 1; }
+  }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   CardContent,
   CardDescription,
@@ -62,9 +63,10 @@ export function UpcomingDeadlines({ className }: { className?: string }) {
           deadlines.map((deadline) => {
             const label = dueLabel(deadline.dueDate);
             return (
-              <div
+              <Link
                 key={deadline.id}
-                className="-mx-2 flex items-center justify-between gap-3 rounded-[3px] px-2 py-2.5"
+                href={`/cases/${deadline.caseId}`}
+                className="-mx-2 flex items-center justify-between gap-3 rounded-[3px] px-2 py-2.5 transition-colors hover:bg-accent/40"
               >
                 <div className="min-w-0">
                   <p
@@ -88,7 +90,7 @@ export function UpcomingDeadlines({ className }: { className?: string }) {
                     {formatDateString(deadline.dueDate)}
                   </p>
                 </div>
-              </div>
+              </Link>
             );
           })
         ) : (

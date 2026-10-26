@@ -29,3 +29,8 @@ export function capitalize(str: string) {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
+
+/** "PRE_TRIAL" → "Pre Trial"; "—" when empty. */
+export function formatEnum(value?: string | null) {
+  return value ? value.split("_").map(capitalize).join(" ") : "—";
+}

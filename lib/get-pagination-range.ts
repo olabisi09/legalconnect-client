@@ -1,52 +1,25 @@
-// lib/get-pagination-range.ts
-const ELLIPSIS = "ellipsis" as const;
-
+/**
+ * Page numbers to render (0-based), collapsing long runs into "ellipsis".
+ * Always shows the first and last page plus `siblings` either side of the current one.
+ */
 export function getPaginationRange(
   pageIndex: number,
   pageCount: number,
-  siblingCount = 1,
-): (number | typeof ELLIPSIS)[] {
-  const totalPageNumbers = siblingCount * 2 + 5; // first + last + current + 2 siblings + 2 ellipses
-
-  if (pageCount <= totalPageNumbers) {
+  siblings = 1,
+): (number | "ellipsis")[] {
+  const totalSlots = siblings * 2 + 5;
+  if (pageCount <= totalSlots) {
     return Array.from({ length: pageCount }, (_, i) => i);
   }
 
-  const leftSiblingIndex = Math.max(pageIndex - siblingCount, 0);
-  const rightSiblingIndex = Math.min(pageIndex + siblingCount, pageCount - 1);
+  const start = Math.max(pageIndex - siblings, 1);
+  const end = Math.min(pageIndex + siblings, pageCount - 2);
+  const range: (number | "ellipsis")[] = [0];
 
-  const showLeftEllipsis = leftSiblingIndex > 1;
-  const showRightEllipsis = rightSiblingIndex < pageCount - 2;
+  if (start > 1) range.push("ellipsis");
+  for (let i = start; i <= end; i++) range.push(i);
+  if (end < pageCount - 2) range.push("ellipsis");
 
-  if (!showLeftEllipsis && showRightEllipsis) {
-    const leftItemCount = 3 + siblingCount * 2;
-    return [
-      ...Array.from({ length: leftItemCount }, (_, i) => i),
-      ELLIPSIS,
-      pageCount - 1,
-    ];
-  }
-
-  if (showLeftEllipsis && !showRightEllipsis) {
-    const rightItemCount = 3 + siblingCount * 2;
-    return [
-      0,
-      ELLIPSIS,
-      ...Array.from(
-        { length: rightItemCount },
-        (_, i) => pageCount - rightItemCount + i,
-      ),
-    ];
-  }
-
-  return [
-    0,
-    ELLIPSIS,
-    ...Array.from(
-      { length: rightSiblingIndex - leftSiblingIndex + 1 },
-      (_, i) => leftSiblingIndex + i,
-    ),
-    ELLIPSIS,
-    pageCount - 1,
-  ];
+  range.push(pageCount - 1);
+  return range;
 }

@@ -1,5 +1,10 @@
 import axios from "axios";
-import type { ApiResponse, ApiError, PagedResponse } from "@/types/shared";
+import type {
+  AdvancedPageResponse,
+  ApiResponse,
+  ApiError,
+  PagedResponse,
+} from "@/types/shared";
 import { useAuthStore } from "@/store/auth-store";
 import { isOrgUnavailableError, normalizeApiError } from "./error";
 
@@ -111,6 +116,52 @@ export function unwrapPage<T>(response: {
   data: ApiResponse<PagedResponse<T>>;
 }): PagedResponse<T> {
   return response.data.data;
+}
+
+/**
+ * Client list endpoints aren't consistent: some return a bare array, some a
+ * PagedResponse ({data, pagination}), some a raw Spring Page ({content, ...}).
+ * Normalise all three to PagedResponse so pages don't care which they got.
+ */
+export function toPage<T>(
+  payload: T[] | PagedResponse<T> | AdvancedPageResponse<T> | null,
+  requested: { page?: number; size?: number } = {},
+): PagedResponse<T> {
+  const page = requested.page ?? 0;
+  const size = requested.size ?? 20;
+
+  if (Array.isArray(payload) || !payload) {
+    const data = payload ?? [];
+    // No totals on a bare array; a full page is the only hint there may be more.
+    const hasNext = data.length >= size;
+    return {
+      data,
+      pagination: {
+        page,
+        size,
+        total: page * size + data.length,
+        totalPages: page + (hasNext ? 2 : 1),
+        hasNext,
+        hasPrevious: page > 0,
+      },
+    };
+  }
+
+  if ("content" in payload) {
+    return {
+      data: payload.content,
+      pagination: {
+        page: payload.number,
+        size: payload.size,
+        total: payload.totalElements,
+        totalPages: payload.totalPages,
+        hasNext: !payload.last,
+        hasPrevious: !payload.first,
+      },
+    };
+  }
+
+  return payload;
 }
 
 export function getApiData<T>(response: { data: ApiResponse<T> }): T {

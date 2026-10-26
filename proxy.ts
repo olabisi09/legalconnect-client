@@ -1,7 +1,13 @@
 import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/cookie";
 import { type NextRequest, NextResponse } from "next/server";
 
-const protectedRoutes = ["/dashboard", "/profile", "/activity"];
+const protectedRoutes = [
+  "/dashboard",
+  "/profile",
+  "/activity",
+  "/cases",
+  "/calendar",
+];
 // Signed-in clients are sent to the dashboard instead of these.
 const guestOnlyRoutes = ["/login", "/forgot-password", "/reset-password"];
 
@@ -35,6 +41,8 @@ export const config = {
     "/dashboard/:path*",
     "/profile/:path*",
     "/activity/:path*",
+    "/cases/:path*",
+    "/calendar/:path*",
     "/login",
     "/forgot-password",
     "/reset-password",

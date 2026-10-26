@@ -2,9 +2,15 @@ export type StatusTone = "positive" | "negative" | "neutral";
 
 export function statusTone(value: string): StatusTone {
   const v = value.toUpperCase();
-  if (["ACTIVE", "CURRENT", "VERIFIED"].includes(v)) return "positive";
+  if (
+    ["ACTIVE", "CURRENT", "VERIFIED", "COMPLETED", "PUBLISHED", "APPROVED"].includes(v)
+  )
+    return "positive";
   if (
     [
+      "OVERDUE",
+      "REJECTED",
+      "URGENT",
       "ARCHIVED",
       "SUSPENDED",
       "CANCELED",

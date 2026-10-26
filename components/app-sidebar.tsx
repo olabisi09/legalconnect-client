@@ -7,7 +7,6 @@ import {
   RiGovernmentLine,
   RiReceiptLine,
   RiCalendarLine,
-  RiFileSearchLine,
   RiScrollToBottomLine,
   RiBuilding2Line,
   RiSettings3Line,
@@ -51,18 +50,8 @@ interface NavItem {
 
 const practiceNav = [
   { title: "Dashboard", href: "/dashboard", icon: RiHomeLine },
-  { title: "Case Management", href: "/cases", icon: RiFolderLine },
-  { title: "Events", href: "/events", icon: RiCalendarLine },
-  // {
-  //   title: "Conflict Check",
-  //   href: "/conflicts",
-  //   icon: RiFileSearchLine,
-  // },
-  {
-    title: "Hearings",
-    href: "/hearings",
-    icon: RiFileSearchLine,
-  },
+  { title: "Cases", href: "/cases", icon: RiFolderLine },
+  { title: "Calendar", href: "/calendar", icon: RiCalendarLine },
 ];
 
 const financeNav = [

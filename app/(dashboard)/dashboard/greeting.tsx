@@ -1,26 +1,15 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import { DashboardCard } from "@/components/dashboard-card";
 import { CardContent } from "@/components/ui/card";
 import { DASHBOARD_LOCALE } from "@/lib/formatter";
 import { useAuthStore } from "@/store/auth-store";
+import { useIsClient } from "@/hooks/use-is-client";
 
 function greetingForHour(hour: number) {
   if (hour < 12) return "Good morning";
   if (hour < 18) return "Good afternoon";
   return "Good evening";
-}
-
-const subscribe = () => () => {};
-
-/** The time of day and the persisted user only exist in the browser; render them after hydration. */
-function useIsClient() {
-  return useSyncExternalStore(
-    subscribe,
-    () => true,
-    () => false,
-  );
 }
 
 function GreetingText() {

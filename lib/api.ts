@@ -1,6 +1,15 @@
 import { ApiResponse, PagedResponse } from "@/types/shared";
 import { Notification } from "@/types/notification";
-import { apiClient, unwrap } from "./api-client";
+import { apiClient, toPage, unwrap } from "./api-client";
+import {
+  CaseListParams,
+  ClientCaseDeadline,
+  ClientCaseDetail,
+  ClientCaseSummary,
+} from "@/types/case";
+import { ClientDocument, DocumentListParams } from "@/types/document";
+import { CalendarEvent, CalendarParams } from "@/types/calendar";
+import { getFileNameFromContentDispositionHeader } from "./download";
 import {
   AuthResponse,
   LoginPayload,
@@ -111,6 +120,83 @@ export const notificationAPI = {
   markAllAsRead: async () =>
     await apiClient
       .post<ApiResponse<{ message: string }>>(`/client/notifications/read-all`)
+      .then(unwrap),
+};
+
+type ListPayload<T> = Parameters<typeof toPage<T>>[0];
+
+export const casesAPI = {
+  getCases: async (params: CaseListParams = {}) =>
+    await apiClient
+      .get<ApiResponse<ListPayload<ClientCaseSummary>>>("/client/cases", {
+        params,
+      })
+      .then(unwrap)
+      .then((payload) => toPage(payload, params)),
+
+  getCase: async (caseId: string) =>
+    await apiClient
+      .get<ApiResponse<ClientCaseDetail>>(`/client/cases/${caseId}`)
+      .then(unwrap),
+
+  /** Court events in plain words — the same entries as the activity feed. */
+  getTimeline: async (
+    caseId: string,
+    params: { page?: number; size?: number } = {},
+  ) =>
+    await apiClient
+      .get<
+        ApiResponse<ListPayload<RecentActivity>>
+      >(`/client/cases/${caseId}/timeline`, { params })
+      .then(unwrap)
+      .then((payload) => toPage(payload, params)),
+
+  getDeadlines: async (caseId: string) =>
+    await apiClient
+      .get<
+        ApiResponse<ClientCaseDeadline[]>
+      >(`/client/cases/${caseId}/deadlines`)
+      .then(unwrap),
+};
+
+export const documentsAPI = {
+  getCaseDocuments: async (caseId: string, params: DocumentListParams = {}) =>
+    await apiClient
+      .get<
+        ApiResponse<ListPayload<ClientDocument>>
+      >(`/client/cases/${caseId}/documents`, { params })
+      .then(unwrap)
+      .then((payload) => toPage(payload, params)),
+
+  getDocument: async (documentId: string) =>
+    await apiClient
+      .get<ApiResponse<ClientDocument>>(`/client/documents/${documentId}`)
+      .then(unwrap),
+
+  /** Raw file stream, not JSON. Falls back to the stored name if the header has none. */
+  download: async (document: Pick<ClientDocument, "id" | "fileName">) => {
+    const response = await apiClient.get<Blob>(
+      `/client/documents/${document.id}/download`,
+      { responseType: "blob" },
+    );
+
+    let fileName = document.fileName;
+    try {
+      fileName = getFileNameFromContentDispositionHeader(
+        response.headers["content-disposition"] ?? null,
+      );
+    } catch {
+      // keep the stored file name
+    }
+
+    return { blob: response.data, fileName };
+  },
+};
+
+export const calendarAPI = {
+  getEvents: async (params: CalendarParams = {}) =>
+    await apiClient
+      .get<ApiResponse<CalendarEvent[]>>("/client/calendar/events", { params })
       .then(unwrap),
 };
 

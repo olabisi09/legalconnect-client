@@ -1,17 +1,7 @@
-import { API_BASE_URL } from "@/lib/constants";
-import { clearAuthCookie, REFRESH_COOKIE, setAuthCookie } from "@/lib/cookie";
-import axios from "axios";
+import { clearAuthCookie, REFRESH_COOKIE } from "@/lib/cookie";
+import { refreshClientSession } from "@/lib/session";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-
-type RefreshResponse = {
-  accessToken?: string;
-  refreshToken?: string;
-  data?: {
-    accessToken?: string;
-    refreshToken?: string;
-  };
-};
 
 export async function POST() {
   const cookieStore = await cookies();
@@ -24,34 +14,15 @@ export async function POST() {
     );
   }
 
-  try {
-    const response = await axios.post(
-      `${API_BASE_URL}/api/v1/auth/refresh`,
-      { refresh_token: refreshToken },
-      {
-        headers: { "Content-Type": "application/json" },
-        timeout: 30000,
-      },
-    );
+  const accessToken = await refreshClientSession(refreshToken);
 
-    const data = response?.data as RefreshResponse;
-    const payload = data?.data ?? data;
-
-    if (!payload.accessToken) {
-      throw new Error("No access token returned from refresh endpoint");
-    }
-
-    await setAuthCookie(
-      payload.accessToken,
-      payload.refreshToken ?? refreshToken,
-    );
-
-    return NextResponse.json({ success: true });
-  } catch {
+  if (!accessToken) {
     await clearAuthCookie();
     return NextResponse.json(
       { message: "Unable to refresh session" },
       { status: 401 },
     );
   }
+
+  return NextResponse.json({ success: true });
 }

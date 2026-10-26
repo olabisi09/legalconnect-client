@@ -4,7 +4,8 @@ import { hasPermission, Permission } from "@/lib/permissions";
 import { useAuthStore } from "@/store/auth-store";
 
 export function usePermission() {
-  const permissions = useAuthStore((s) => s.user?.permissions || []);
+  // const permissions = useAuthStore((s) => s.user?.permissions || []);
+  const permissions: Permission[] = [];
   const isHydrated = useAuthStore((s) => s.isHydrated);
 
   return {

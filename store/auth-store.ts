@@ -1,19 +1,6 @@
-import { Permission } from "@/lib/permissions";
-import { OrgRole } from "@/types/auth";
+import { User } from "@/types/auth";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: OrgRole;
-  orgId: string | null;
-  orgName: string | null;
-  mfaRequired: boolean;
-  permissions: Permission[];
-}
 
 interface AuthState {
   isAuthenticated: boolean;

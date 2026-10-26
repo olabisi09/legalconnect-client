@@ -1,13 +1,17 @@
-import { ApiResponse } from "@/types/shared";
+import { ApiResponse, PagedResponse } from "@/types/shared";
+import { Notification } from "@/types/notification";
 import { apiClient, unwrap } from "./api-client";
-import { AuthResponse, RegisterPayload, RegisterResponse } from "@/types/auth";
+import {
+  AuthResponse,
+  LoginPayload,
+  RegisterPayload,
+  RegisterResponse,
+} from "@/types/auth";
+import { Dashboard, RecentActivity } from "@/types/dashboard";
+import { ClientProfile, UpdateProfilePayload } from "@/types/profile";
 
 export const authAPI = {
-  login: async (payload: {
-    email: string;
-    password: string;
-    mfaCode?: string;
-  }) =>
+  login: async (payload: LoginPayload) =>
     await apiClient
       .post<ApiResponse<AuthResponse>>("/client/auth/login", payload)
       .then(unwrap),
@@ -27,8 +31,27 @@ export const authAPI = {
   resetPassword: async (payload: { password: string; token: string }) =>
     await apiClient.post("/client/auth/password/reset", payload).then(unwrap),
 
-  logout: async (payload?: { refreshToken?: string }) =>
-    await apiClient.post("/client/auth/logout", payload).then(unwrap),
+  /** Stores the tokens in httpOnly cookies; every proxied request reads them from there. */
+  createSession: async ({ accessToken, refreshToken }: AuthResponse) => {
+    const response = await fetch("/api/auth/session", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accessToken, refreshToken }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Unable to create authenticated session");
+    }
+  },
+
+  /** Revokes the refresh token server-side (the browser can't read it) and clears the cookies. */
+  logout: async () => {
+    await fetch("/api/auth/session", {
+      method: "DELETE",
+      credentials: "include",
+    });
+  },
 
   enableMFA: async () =>
     await apiClient
@@ -39,4 +62,66 @@ export const authAPI = {
 
   verifyMFA: async (payload: { code: string }) =>
     await apiClient.post("/client/auth/mfa/verify", payload).then(unwrap),
+
+  acceptInvite: async (payload: {
+    token: string;
+    email: string;
+    password: string;
+  }) =>
+    await apiClient
+      .post<
+        ApiResponse<AuthResponse>
+      >("/client/auth/invitation/accept", payload)
+      .then(unwrap),
+};
+
+export const dashboardAPI = {
+  getDashboard: async () =>
+    await apiClient
+      .get<ApiResponse<Dashboard>>("/client/dashboard")
+      .then(unwrap),
+
+  getActivity: async (params?: { limit?: number }) =>
+    await apiClient
+      .get<ApiResponse<RecentActivity[]>>("/client/activity", { params })
+      .then(unwrap),
+};
+
+export const notificationAPI = {
+  getNotifications: async (params?: {
+    page?: number;
+    size?: number;
+    unreadOnly?: boolean;
+  }) =>
+    await apiClient
+      .get<ApiResponse<PagedResponse<Notification>>>(`/client/notifications`, {
+        params,
+      })
+      .then(unwrap),
+  getUnreadCount: async () =>
+    await apiClient
+      .get<ApiResponse<number>>(`/client/notifications/unread-count`)
+      .then(unwrap),
+  markAsRead: async (notificationId: string) =>
+    await apiClient
+      .post<
+        ApiResponse<{ message: string }>
+      >(`/client/notifications/${notificationId}/read`)
+      .then(unwrap),
+  markAllAsRead: async () =>
+    await apiClient
+      .post<ApiResponse<{ message: string }>>(`/client/notifications/read-all`)
+      .then(unwrap),
+};
+
+export const profileAPI = {
+  getProfile: async () =>
+    await apiClient
+      .get<ApiResponse<ClientProfile>>("/client/profile")
+      .then(unwrap),
+
+  updateProfile: async (payload: UpdateProfilePayload) =>
+    await apiClient
+      .put<ApiResponse<ClientProfile>>("/client/profile", payload)
+      .then(unwrap),
 };

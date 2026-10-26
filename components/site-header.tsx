@@ -3,7 +3,7 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
-import { Notifications } from "@/app/(dashboard)/dashboard/_components/notifications";
+import { Notifications } from "./notifications";
 import { ThemeToggle } from "./theme-toggle";
 
 export function SiteHeader() {
@@ -13,6 +13,7 @@ export function SiteHeader() {
     "/dashboard": "Dashboard",
     "/matters": "Matters",
     "/profile": "Profile",
+    "/activity": "Activity",
   };
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">

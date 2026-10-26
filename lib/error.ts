@@ -1,7 +1,9 @@
 export interface NormalizedApiError {
   status: number;
   code: string;
+  errorCode: string | null;
   message: string;
+  data: unknown;
   traceId: string | null;
   path: string | null;
   fieldErrors: Record<string, string>;
@@ -11,7 +13,9 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
   const fallback: NormalizedApiError = {
     status: 0,
     code: "UNKNOWN",
+    errorCode: null,
     message: "An unexpected error occurred",
+    data: null,
     traceId: null,
     path: null,
     fieldErrors: {},
@@ -27,6 +31,8 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
 
     const status = typeof response.status === "number" ? response.status : 0;
     const code = typeof data?.code === "string" ? data.code : "";
+    const errorCode =
+      typeof data?.errorCode === "string" ? data.errorCode : null;
     const message =
       typeof data?.message === "string"
         ? data.message
@@ -48,7 +54,16 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
       }
     }
 
-    return { status, code, message, traceId, path, fieldErrors };
+    return {
+      status,
+      code,
+      errorCode,
+      message,
+      data: data?.data ?? null,
+      traceId,
+      path,
+      fieldErrors,
+    };
   }
 
   return {
@@ -60,6 +75,8 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
 export class ApiRequestError extends Error {
   public status: number;
   public code: string;
+  public errorCode: string | null;
+  public data: unknown;
   public traceId: string | null;
   public path: string | null;
   public fieldErrors: Record<string, string>;
@@ -69,6 +86,8 @@ export class ApiRequestError extends Error {
     this.name = "ApiRequestError";
     this.status = normalized.status;
     this.code = normalized.code;
+    this.errorCode = normalized.errorCode;
+    this.data = normalized.data;
     this.traceId = normalized.traceId;
     this.path = normalized.path;
     this.fieldErrors = normalized.fieldErrors;
@@ -85,6 +104,17 @@ export class ApiRequestError extends Error {
 
 export function toApiError(error: unknown): ApiRequestError {
   return new ApiRequestError(normalizeApiError(error));
+}
+
+/** Every member of a suspended or archived firm gets 403 with one of these, on login and on every call. */
+export const ORG_UNAVAILABLE_CODES = ["ORG_SUSPENDED", "ORG_ARCHIVED"];
+
+export function isOrgUnavailableError(error: unknown): boolean {
+  const normalized = normalizeApiError(error);
+  return (
+    normalized.status === 403 &&
+    ORG_UNAVAILABLE_CODES.includes(normalized.errorCode ?? normalized.code)
+  );
 }
 
 export function isValidationError(error: unknown): boolean {

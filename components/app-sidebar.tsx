@@ -144,7 +144,7 @@ export function AppSidebar() {
               LegalConnect
             </span>
             <span className="font-plexmono text-[10px] text-sidebar-foreground/50">
-              {user?.orgName || "No organization"}
+              {user?.firmName || "No organization"}
             </span>
           </div>
         </div>
@@ -178,7 +178,7 @@ export function AppSidebar() {
 
               <DropdownMenuContent side="top" align="start" className="w-56">
                 <DropdownMenuItem
-                  render={<Link href="/settings">Account settings</Link>}
+                  render={<Link href="/profile">Profile</Link>}
                 />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

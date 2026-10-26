@@ -32,6 +32,24 @@ export interface User {
   firmName: string;
 }
 
+export interface LoginPayload {
+  email: string;
+  password: string;
+  firmSlug?: string;
+}
+
+/** One email can be a client of several firms; login without firmSlug then returns 409 MULTIPLE_FIRMS with these. */
+export interface FirmOption {
+  firmSlug: string;
+  firmName: string;
+}
+
+/** Portal role — only PRIMARY_CONTACT and AUTHORIZED_REPRESENTATIVE can pay. */
+export type ClientRole =
+  | "PRIMARY_CONTACT"
+  | "AUTHORIZED_REPRESENTATIVE"
+  | "VIEWER";
+
 export interface RegisterResponse {
   userId: string;
   orgId: string;

@@ -1,6 +1,15 @@
 import axios from "axios";
 import type { ApiResponse, ApiError, PagedResponse } from "@/types/shared";
 import { useAuthStore } from "@/store/auth-store";
+import { isOrgUnavailableError, normalizeApiError } from "./error";
+
+const AUTH_PAGES = [
+  "/login",
+  "/forgot-password",
+  "/reset-password",
+  "/accept-invitation",
+  "/unavailable",
+];
 
 export const apiClient = axios.create({
   baseURL: "/api/proxy",
@@ -16,7 +25,10 @@ function isLoginRequest(url?: string): boolean {
 
   // Handle both relative urls ("/auth/login") and absolute urls.
   const normalized = url.startsWith("http") ? new URL(url).pathname : url;
-  return normalized.endsWith("/auth/login") || normalized === "auth/login";
+  return (
+    normalized.endsWith("/client/auth/login") ||
+    normalized === "/client/auth/login"
+  );
 }
 
 apiClient.interceptors.request.use((config) => {
@@ -47,6 +59,21 @@ apiClient.interceptors.response.use(
     const status = error?.response?.status as number | undefined;
     const requestUrl = error?.config?.url as string | undefined;
 
+    // A suspended/archived firm isn't a session problem — logging in again won't help.
+    if (isOrgUnavailableError(error) && !isLoginRequest(requestUrl)) {
+      useAuthStore.getState().clearAuthState();
+
+      if (
+        typeof window !== "undefined" &&
+        window.location.pathname !== "/unavailable"
+      ) {
+        const reason = normalizeApiError(error).errorCode ?? "ORG_SUSPENDED";
+        window.location.replace(`/unavailable?reason=${reason}`);
+      }
+
+      return Promise.reject(error);
+    }
+
     if (
       status === 401 &&
       !isLoginRequest(requestUrl) &&
@@ -58,11 +85,9 @@ apiClient.interceptors.response.use(
       clearAuthState();
 
       if (typeof window !== "undefined") {
-        const isAuthPage =
-          window.location.pathname === "/login" ||
-          window.location.pathname.startsWith("/signup") ||
-          window.location.pathname.startsWith("/forgot-password") ||
-          window.location.pathname.startsWith("/mfa");
+        const isAuthPage = AUTH_PAGES.some((page) =>
+          window.location.pathname.startsWith(page),
+        );
 
         if (!isAuthPage) {
           window.location.replace("/login");

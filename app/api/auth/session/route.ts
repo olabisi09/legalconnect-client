@@ -1,8 +1,11 @@
 import {
   clearAuthCookie,
   getAccessTokenFromCookie,
+  REFRESH_COOKIE,
   setAuthCookie,
 } from "@/lib/cookie";
+import { revokeClientSession } from "@/lib/session";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -32,6 +35,12 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE() {
+  // The refresh token is httpOnly, so the browser can't send it to /logout itself.
+  const refreshToken = (await cookies()).get(REFRESH_COOKIE)?.value;
+  if (refreshToken) {
+    await revokeClientSession(refreshToken, await getAccessTokenFromCookie());
+  }
+
   await clearAuthCookie();
   return NextResponse.json({ success: true });
 }

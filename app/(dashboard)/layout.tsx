@@ -1,6 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Suspense } from "react";
 
 export default async function DashboardLayout({
   children,
@@ -18,7 +19,9 @@ export default async function DashboardLayout({
     >
       <AppSidebar />
       <SidebarInset>
-        <SiteHeader />
+        <Suspense fallback={<></>}>
+          <SiteHeader />
+        </Suspense>
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4  md:gap-6 p-4 lg:p-6">

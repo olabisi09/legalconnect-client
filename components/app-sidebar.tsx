@@ -40,6 +40,7 @@ import { useLogout } from "@/hooks/features/use-auth";
 import { getInitials } from "@/lib/utils";
 import { P, Permission } from "@/lib/permissions";
 import { usePermission } from "@/hooks/use-permission";
+import { Suspense } from "react";
 
 interface NavItem {
   title: string;
@@ -117,6 +118,14 @@ function NavGroup({
 }
 
 export function AppSidebar() {
+  return (
+    <Suspense fallback={<></>}>
+      <AppSidebarContent />
+    </Suspense>
+  );
+}
+
+export function AppSidebarContent() {
   const pathname = usePathname();
   const { user } = useAuthStore();
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
